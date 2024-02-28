@@ -9,3 +9,6 @@ edition = "2021"
 homepage = "https://typst.app"
 repository = "https://github.com/typst/typst-assets"
 license = "Apache-2.0"
+
+[features]
+fonts = []

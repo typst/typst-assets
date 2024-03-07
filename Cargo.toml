@@ -1,8 +1,8 @@
 [package]
 name = "typst-assets"
 description = "Assets for the Typst compiler."
-categories = ["compilers", "science"]
-keywords = ["markup", "typesetting", "typst"]
+categories = ["compilers"]
+keywords = ["typst"]
 version = "0.10.0"
 authors = ["The Typst Project Developers"]
 edition = "2021"

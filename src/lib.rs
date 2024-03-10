@@ -78,3 +78,8 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
     ]
     .into_iter()
 }
+
+#[cfg(not(feature = "fonts"))]
+pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
+    [].into_iter()
+}

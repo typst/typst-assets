@@ -57,9 +57,12 @@ pub mod icc {
 
 /// Bundled fonts.
 ///
-/// This is only available if the `fonts` feature is enabled.
-#[cfg(feature = "fonts")]
+/// This returns an empty iterator if the `fonts` feature is disabled.
 pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
+    #[cfg(not(feature = "fonts"))]
+    return [].into_iter();
+
+    #[cfg(feature = "fonts")]
     [
         asset!("fonts/LinLibertine_R.ttf"),
         asset!("fonts/LinLibertine_RB.ttf"),

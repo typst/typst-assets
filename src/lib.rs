@@ -55,6 +55,49 @@ pub mod icc {
     pub const S_RGB_V4: &[u8] = asset!("icc/sRGB-v4.icc");
 }
 
+
+macro_rules! translation {
+    ($path:literal) => {
+        ($path, include_str!(concat!("../files/translations/", $path, ".txt")))
+    };
+}
+
+pub fn translations() -> impl Iterator<Item = (&'static str, &'static str)> {
+    [
+        translation!("ar"),
+        translation!("cs"),
+        translation!("da"),
+        translation!("de"),
+        translation!("en"),
+        translation!("es"),
+        translation!("et"),
+        translation!("fi"),
+        translation!("fr"),
+        translation!("gr"),
+        translation!("hu"),
+        translation!("it"),
+        translation!("ja"),
+        translation!("nb"),
+        translation!("nl"),
+        translation!("nn"),
+        translation!("pl"),
+        translation!("pt-PT"),
+        translation!("pt"),
+        translation!("ro"),
+        translation!("ru"),
+        translation!("sl"),
+        translation!("sq"),
+        translation!("sr"),
+        translation!("sv"),
+        translation!("tl"),
+        translation!("tr"),
+        translation!("ua"),
+        translation!("vi"),
+        translation!("zh-TW"),
+        translation!("zh"),
+    ].into_iter()
+}
+
 /// Bundled fonts.
 ///
 /// This returns an empty iterator if the `fonts` feature is disabled.

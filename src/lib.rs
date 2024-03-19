@@ -55,10 +55,12 @@ pub mod icc {
     pub const S_RGB_V4: &[u8] = asset!("icc/sRGB-v4.icc");
 }
 
-
 macro_rules! translation {
     ($path:literal) => {
-        ($path, include_str!(concat!("../files/translations/", $path, ".txt")))
+        (
+            $path,
+            include_str!(concat!("../files/translations/", $path, ".txt")),
+        )
     };
 }
 
@@ -95,7 +97,8 @@ pub fn translations() -> impl Iterator<Item = (&'static str, &'static str)> {
         translation!("vi"),
         translation!("zh-TW"),
         translation!("zh"),
-    ].into_iter()
+    ]
+    .into_iter()
 }
 
 /// Bundled fonts.

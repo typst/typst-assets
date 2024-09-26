@@ -70,6 +70,7 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
         asset!("fonts/LibertinusSerif-BoldItalic.otf"),
         asset!("fonts/LibertinusSerif-Semibold.otf"),
         asset!("fonts/LibertinusSerif-SemiboldItalic.otf"),
+        asset!("fonts/NewCMMath-Bold.otf"),
         asset!("fonts/NewCMMath-Book.otf"),
         asset!("fonts/NewCMMath-Regular.otf"),
         asset!("fonts/NewCM10-Regular.otf"),

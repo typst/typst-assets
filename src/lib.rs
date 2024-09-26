@@ -68,6 +68,7 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
         asset!("fonts/LinLibertine_RB.ttf"),
         asset!("fonts/LinLibertine_RBI.ttf"),
         asset!("fonts/LinLibertine_RI.ttf"),
+        asset!("fonts/NewCMMath-Bold.otf"),
         asset!("fonts/NewCMMath-Book.otf"),
         asset!("fonts/NewCMMath-Regular.otf"),
         asset!("fonts/NewCM10-Regular.otf"),

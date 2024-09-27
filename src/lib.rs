@@ -64,10 +64,12 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
 
     #[cfg(feature = "fonts")]
     [
-        asset!("fonts/LinLibertine_R.ttf"),
-        asset!("fonts/LinLibertine_RB.ttf"),
-        asset!("fonts/LinLibertine_RBI.ttf"),
-        asset!("fonts/LinLibertine_RI.ttf"),
+        asset!("fonts/LibertinusSerif-Regular.otf"),
+        asset!("fonts/LibertinusSerif-Bold.otf"),
+        asset!("fonts/LibertinusSerif-Italic.otf"),
+        asset!("fonts/LibertinusSerif-BoldItalic.otf"),
+        asset!("fonts/LibertinusSerif-Semibold.otf"),
+        asset!("fonts/LibertinusSerif-SemiboldItalic.otf"),
         asset!("fonts/NewCMMath-Bold.otf"),
         asset!("fonts/NewCMMath-Book.otf"),
         asset!("fonts/NewCMMath-Regular.otf"),

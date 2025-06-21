@@ -1,0 +1,10 @@
+[package]
+name = "typst-assets-codegen"
+edition = "2021"
+version = "0.0.0"
+publish = false
+
+[dependencies]
+regex = "1.11"
+scraper = "0.23.1"
+ureq = "3.0"

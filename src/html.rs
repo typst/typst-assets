@@ -95,6 +95,12 @@ pub enum Type {
     YesNo,
     /// `boolean` → `"on"` or `"off"`.
     OnOff,
+    /// `ltr` or `rtl` → `"ltr"` or `"rtl"`.
+    HorizontalDir,
+    /// `string` → string.
+    Str,
+    /// `char` → string.
+    Char,
     /// `int` → stringified int.
     Int,
     /// `int >= 0` → stringified int.
@@ -105,18 +111,12 @@ pub enum Type {
     Float,
     /// `float` > 0 → stringified float.
     PositiveFloat,
-    /// `string` → string.
-    Str,
-    /// `char` → string.
-    Char,
     /// `datetime` → stringified datetime.
     Datetime,
     /// `duration` → stringified duration.
     Duration,
     /// `color` → stringified CSS color.
     Color,
-    /// `ltr` or `rtl` → `"ltr"` or `"rtl"`.
-    HorizontalDir,
     /// `array (w, h)` of two `int >= 0` → `"{w}x{h}"`.
     IconSize,
     /// `dictionary` with keys `src` (string) and optionally `width` (int) or

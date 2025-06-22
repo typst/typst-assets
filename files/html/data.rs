@@ -589,7 +589,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-autocomplete",
         "Indicates whether inputting text could trigger display of one or more predictions of the user's intended value for an input and specifies how predictions would be presented if they are made.",
-        Type::Union(&[Type::None, Type::Strings(255, 258)]),
+        Type::Union(&[Type::None, Type::Strings(317, 320)]),
     ),
     AttrInfo::new(
         "aria-busy",
@@ -599,7 +599,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-checked",
         "Indicates the current \"checked\" state of checkboxes, radio buttons, and other widgets. See related aria-pressed and aria-selected.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(258, 259)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(320, 321)]),
     ),
     AttrInfo::new(
         "aria-colcount",
@@ -624,7 +624,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-current",
         "Indicates the element that represents the current item within a container or set of related elements.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(259, 264)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(321, 326)]),
     ),
     AttrInfo::new(
         "aria-describedby",
@@ -659,7 +659,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-haspopup",
         "Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(264, 269)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(326, 331)]),
     ),
     AttrInfo::new(
         "aria-hidden",
@@ -669,7 +669,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-invalid",
         "Indicates the entered value does not conform to the format expected by the application. See related aria-errormessage.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(269, 271)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(331, 333)]),
     ),
     AttrInfo::new(
         "aria-keyshortcuts",
@@ -694,7 +694,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-live",
         "Indicates that an element will be updated, and describes the types of updates the user agents, assistive technologies, and user can expect from the live region.",
-        Type::Strings(271, 274),
+        Type::Strings(333, 336),
     ),
     AttrInfo::new(
         "aria-modal",
@@ -714,7 +714,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-orientation",
         "Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous.",
-        Type::Strings(274, 277),
+        Type::Strings(336, 339),
     ),
     AttrInfo::new(
         "aria-owns",
@@ -734,7 +734,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-pressed",
         "Indicates the current \"pressed\" state of toggle buttons. See related aria-checked and aria-selected.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(258, 259)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(320, 321)]),
     ),
     AttrInfo::new(
         "aria-readonly",
@@ -744,7 +744,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-relevant",
         "Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified. See related aria-atomic.",
-        Type::List(&Type::Strings(277, 282), ' ', true),
+        Type::List(&Type::Strings(339, 344), ' ', true),
     ),
     AttrInfo::new(
         "aria-required",
@@ -784,7 +784,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "aria-sort",
         "Indicates if items in a table or grid are sorted in ascending or descending order.",
-        Type::Union(&[Type::None, Type::Strings(282, 285)]),
+        Type::Union(&[Type::None, Type::Strings(344, 347)]),
     ),
     AttrInfo::new(
         "aria-valuemax",
@@ -829,7 +829,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "contenteditable",
         "Whether the element is editable.",
-        Type::Union(&[Type::TrueFalse, Type::Strings(36, 37)]),
+        Type::Union(&[Type::TrueFalse, Type::Strings(98, 99)]),
     ),
     AttrInfo::new(
         "dir",
@@ -844,12 +844,12 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "enterkeyhint",
         "Hint for selecting an enter key action.",
-        Type::Strings(44, 51),
+        Type::Strings(106, 113),
     ),
     AttrInfo::new(
         "hidden",
         "Whether the element is relevant.",
-        Type::Union(&[Type::Presence, Type::Strings(60, 61)]),
+        Type::Union(&[Type::Presence, Type::Strings(122, 123)]),
     ),
     AttrInfo::new(
         "id",
@@ -864,7 +864,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "inputmode",
         "Hint for selecting an input modality.",
-        Type::Union(&[Type::None, Type::Strings(66, 73)]),
+        Type::Union(&[Type::None, Type::Strings(128, 135)]),
     ),
     AttrInfo::new(
         "is",
@@ -909,12 +909,12 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "popover",
         "Makes the element a popover element.",
-        Type::Union(&[Type::Auto, Type::Strings(80, 81)]),
+        Type::Union(&[Type::Auto, Type::Strings(142, 143)]),
     ),
     AttrInfo::new(
         "role",
         "An ARIA role.",
-        Type::Union(&[Type::None, Type::Strings(175, 255)]),
+        Type::Union(&[Type::None, Type::Strings(237, 317)]),
     ),
     AttrInfo::new(
         "slot",
@@ -924,7 +924,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "spellcheck",
         "Whether the element is to have its spelling and grammar checked.",
-        Type::Presence,
+        Type::TrueFalse,
     ),
     AttrInfo::new(
         "style",
@@ -949,7 +949,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "writingsuggestions",
         "Whether the element can offer writing suggestions or not.",
-        Type::Presence,
+        Type::TrueFalse,
     ),
     AttrInfo::new(
         "abbr",
@@ -959,7 +959,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "accept",
         "Hint for expected file type in file upload controls.",
-        Type::List(&Type::Str, ',', true),
+        Type::List(&Type::Str, ' ', true),
     ),
     AttrInfo::new(
         "accept-charset",
@@ -1009,7 +1009,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "autocomplete",
         "Hint for form autofill feature.",
-        Type::Str,
+        Type::List(&Type::Strings(26, 87), ' ', true),
     ),
     AttrInfo::new(
         "autoplay",
@@ -1019,7 +1019,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "blocking",
         "Whether the element is potentially render-blocking.",
-        Type::List(&Type::Str, ' ', true),
+        Type::List(&Type::Strings(87, 88), ' ', true),
     ),
     AttrInfo::new(
         "charset",
@@ -1039,7 +1039,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "closedby",
         "Which user actions will close the dialog.",
-        Type::Union(&[Type::None, Type::Strings(26, 28)]),
+        Type::Union(&[Type::None, Type::Strings(88, 90)]),
     ),
     AttrInfo::new(
         "color",
@@ -1049,7 +1049,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "colorspace",
         "The color space of the serialized color.",
-        Type::Strings(28, 30),
+        Type::Strings(90, 92),
     ),
     AttrInfo::new(
         "cols",
@@ -1064,7 +1064,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "command",
         "Indicates to the targeted element which action to take.",
-        Type::Union(&[Type::Strings(30, 36), Type::Str]),
+        Type::Union(&[Type::Strings(92, 98), Type::Str]),
     ),
     AttrInfo::new(
         "commandfor",
@@ -1089,7 +1089,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "crossorigin",
         "How the element handles crossorigin requests.",
-        Type::Strings(37, 39),
+        Type::Strings(99, 101),
     ),
     AttrInfo::new(
         "data",
@@ -1109,7 +1109,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "decoding",
         "Decoding hint to use when processing this image for presentation.",
-        Type::Union(&[Type::Auto, Type::Strings(39, 41)]),
+        Type::Union(&[Type::Auto, Type::Strings(101, 103)]),
     ),
     AttrInfo::new(
         "default",
@@ -1154,12 +1154,12 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "enctype",
         "Entry list encoding type to use for form submission.",
-        Type::Strings(41, 44),
+        Type::Strings(103, 106),
     ),
     AttrInfo::new(
         "fetchpriority",
         "Sets the priority for fetches initiated by the element.",
-        Type::Union(&[Type::Auto, Type::Strings(51, 53)]),
+        Type::Union(&[Type::Auto, Type::Strings(113, 115)]),
     ),
     AttrInfo::new(
         "for",
@@ -1184,12 +1184,12 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "formenctype",
         "Entry list encoding type to use for form submission.",
-        Type::Strings(41, 44),
+        Type::Strings(103, 106),
     ),
     AttrInfo::new(
         "formmethod",
         "Variant to use for form submission.",
-        Type::Strings(53, 56),
+        Type::Strings(115, 118),
     ),
     AttrInfo::new(
         "formnovalidate",
@@ -1199,7 +1199,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "formtarget",
         "Navigable for form submission.",
-        Type::Union(&[Type::Strings(56, 60), Type::Str]),
+        Type::Union(&[Type::Strings(118, 122), Type::Str]),
     ),
     AttrInfo::new(
         "headers",
@@ -1239,7 +1239,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "http-equiv",
         "Pragma directive.",
-        Type::Strings(61, 66),
+        Type::Strings(123, 128),
     ),
     AttrInfo::new(
         "imagesizes",
@@ -1264,7 +1264,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "kind",
         "The type of text track.",
-        Type::Strings(73, 78),
+        Type::Strings(135, 140),
     ),
     AttrInfo::new(
         "label",
@@ -1279,7 +1279,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "loading",
         "Used when determining loading deferral.",
-        Type::Strings(78, 80),
+        Type::Strings(140, 142),
     ),
     AttrInfo::new(
         "loop",
@@ -1314,7 +1314,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "method",
         "Variant to use for form submission.",
-        Type::Strings(53, 56),
+        Type::Strings(115, 118),
     ),
     AttrInfo::new(
         "min",
@@ -1359,7 +1359,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "name",
         "Name of content navigable.",
-        Type::Union(&[Type::Strings(56, 60), Type::Str]),
+        Type::Union(&[Type::Strings(118, 122), Type::Str]),
     ),
     AttrInfo::new(
         "name",
@@ -1429,7 +1429,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "popovertargetaction",
         "Indicates whether a targeted popover element is to be toggled, shown, or hidden.",
-        Type::Strings(81, 84),
+        Type::Strings(143, 146),
     ),
     AttrInfo::new(
         "poster",
@@ -1439,7 +1439,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "preload",
         "Hints how much buffering the media resource will likely need.",
-        Type::Union(&[Type::None, Type::Auto, Type::Strings(77, 78)]),
+        Type::Union(&[Type::None, Type::Auto, Type::Strings(139, 140)]),
     ),
     AttrInfo::new(
         "readonly",
@@ -1454,22 +1454,22 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "referrerpolicy",
         "Referrer policy for fetches initiated by the element.",
-        Type::Union(&[Type::Strings(84, 92), Type::NoneEmpty]),
+        Type::Union(&[Type::Strings(146, 154), Type::NoneEmpty]),
     ),
     AttrInfo::new(
         "rel",
         "Relationship between the location in the document containing the hyperlink and the destination resource.",
-        Type::List(&Type::Strings(92, 119), ' ', true),
+        Type::List(&Type::Strings(154, 181), ' ', true),
     ),
     AttrInfo::new(
         "rel",
         "Relationship between the document containing the hyperlink and the destination resource.",
-        Type::List(&Type::Strings(92, 119), ' ', true),
+        Type::List(&Type::Strings(154, 181), ' ', true),
     ),
     AttrInfo::new(
         "rel",
         "Relationship between the document containing the form and its action destination",
-        Type::List(&Type::Strings(92, 119), ' ', true),
+        Type::List(&Type::Strings(154, 181), ' ', true),
     ),
     AttrInfo::new(
         "required",
@@ -1494,12 +1494,12 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "sandbox",
         "Security rules for nested content.",
-        Type::List(&Type::Strings(119, 132), ' ', true),
+        Type::List(&Type::Strings(181, 194), ' ', true),
     ),
     AttrInfo::new(
         "scope",
         "Specifies which cells the header cell applies to.",
-        Type::Strings(132, 136),
+        Type::Strings(194, 198),
     ),
     AttrInfo::new(
         "selected",
@@ -1524,7 +1524,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "shadowrootmode",
         "Enables streaming declarative shadow roots.",
-        Type::Strings(136, 138),
+        Type::Strings(198, 200),
     ),
     AttrInfo::new(
         "shadowrootserializable",
@@ -1534,7 +1534,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "shape",
         "The kind of shape to be created in an image map.",
-        Type::Strings(138, 142),
+        Type::Strings(200, 204),
     ),
     AttrInfo::new(
         "size",
@@ -1584,22 +1584,22 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "step",
         "Granularity to be matched by the form control's value.",
-        Type::Union(&[Type::PositiveFloat, Type::Strings(26, 27)]),
+        Type::Union(&[Type::PositiveFloat, Type::Strings(88, 89)]),
     ),
     AttrInfo::new(
         "target",
         "Navigable for hyperlink navigation.",
-        Type::Union(&[Type::Strings(56, 60), Type::Str]),
+        Type::Union(&[Type::Strings(118, 122), Type::Str]),
     ),
     AttrInfo::new(
         "target",
         "Default navigable for hyperlink navigation and form submission.",
-        Type::Union(&[Type::Strings(56, 60), Type::Str]),
+        Type::Union(&[Type::Strings(118, 122), Type::Str]),
     ),
     AttrInfo::new(
         "target",
         "Navigable for form submission.",
-        Type::Union(&[Type::Strings(56, 60), Type::Str]),
+        Type::Union(&[Type::Strings(118, 122), Type::Str]),
     ),
     AttrInfo::new(
         "title",
@@ -1629,7 +1629,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "type",
         "Type of button.",
-        Type::Strings(142, 145),
+        Type::Strings(204, 207),
     ),
     AttrInfo::new(
         "type",
@@ -1639,17 +1639,17 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "type",
         "Type of form control.",
-        Type::Strings(145, 167),
+        Type::Strings(207, 229),
     ),
     AttrInfo::new(
         "type",
         "Kind of list marker.",
-        Type::Strings(167, 172),
+        Type::Strings(229, 234),
     ),
     AttrInfo::new(
         "type",
         "Type of script.",
-        Type::Union(&[Type::Strings(172, 173), Type::Str]),
+        Type::Union(&[Type::Strings(234, 235), Type::Str]),
     ),
     AttrInfo::new(
         "usemap",
@@ -1689,7 +1689,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "wrap",
         "How the value of the form control is to be wrapped for form submission.",
-        Type::Strings(173, 175),
+        Type::Strings(235, 237),
     ),
 ];
 
@@ -1724,6 +1724,68 @@ pub const ATTR_STRINGS: &[(&str, &str)] = &[
     ("sentences", ""),
     ("words", ""),
     ("characters", ""),
+    ("shipping", ""),
+    ("billing", ""),
+    ("name", ""),
+    ("honorific-prefix", ""),
+    ("given-name", ""),
+    ("additional-name", ""),
+    ("family-name", ""),
+    ("honorific-suffix", ""),
+    ("nickname", ""),
+    ("username", ""),
+    ("new-password", ""),
+    ("current-password", ""),
+    ("one-time-code", ""),
+    ("organization-title", ""),
+    ("organization", ""),
+    ("street-address", ""),
+    ("address-line1", ""),
+    ("address-line2", ""),
+    ("address-line3", ""),
+    ("address-level4", ""),
+    ("address-level3", ""),
+    ("address-level2", ""),
+    ("address-level1", ""),
+    ("country", ""),
+    ("country-name", ""),
+    ("postal-code", ""),
+    ("cc-name", ""),
+    ("cc-given-name", ""),
+    ("cc-additional-name", ""),
+    ("cc-family-name", ""),
+    ("cc-number", ""),
+    ("cc-exp", ""),
+    ("cc-exp-month", ""),
+    ("cc-exp-year", ""),
+    ("cc-csc", ""),
+    ("cc-type", ""),
+    ("transaction-currency", ""),
+    ("transaction-amount", ""),
+    ("language", ""),
+    ("bday", ""),
+    ("bday-day", ""),
+    ("bday-month", ""),
+    ("bday-year", ""),
+    ("sex", ""),
+    ("url", ""),
+    ("photo", ""),
+    ("home", ""),
+    ("work", ""),
+    ("mobile", ""),
+    ("fax", ""),
+    ("pager", ""),
+    ("tel", ""),
+    ("tel-country-code", ""),
+    ("tel-national", ""),
+    ("tel-area-code", ""),
+    ("tel-local", ""),
+    ("tel-local-prefix", ""),
+    ("tel-local-suffix", ""),
+    ("tel-extension", ""),
+    ("email", ""),
+    ("impp", ""),
+    ("blocking", ""),
     ("any", ""),
     ("closerequest", ""),
     ("limited-srgb", ""),

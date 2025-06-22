@@ -43,7 +43,7 @@ pub fn main() {
     let code = codegen(&output);
     std::fs::write(path, code).unwrap();
 
-    println!("Success!");
+    eprintln!("Success!");
 }
 
 /// Reads a spec from the directory or, if it does not exist, fetches and stores it.
@@ -51,11 +51,11 @@ fn load_spec(spec_dir: &Option<PathBuf>, name: &str, url: &str) -> ElementRef<'s
     let text = if let Some(dir) = spec_dir {
         let path = dir.join(name).with_extension("html");
         if path.exists() {
-            println!("Reading from {}", path.display());
+            eprintln!("Reading from {}", path.display());
             std::fs::read_to_string(&path).unwrap()
         } else {
             let text = crate::fetch(url);
-            println!("Writing to {}", path.display());
+            eprintln!("Writing to {}", path.display());
             std::fs::create_dir_all(dir).unwrap();
             std::fs::write(&path, &text).unwrap();
             text
@@ -124,6 +124,61 @@ enum Type {
 }
 
 impl Type {
+    /// Allocates a string enum type in the output.
+    fn strings<V: EnumVariant>(ctx: &mut Context, variants: impl IntoIterator<Item = V>) -> Type {
+        let mut variants: Vec<_> = variants.into_iter().map(V::with_docs).collect();
+        let mut extract = |list: &[&str]| {
+            let has = list
+                .iter()
+                .all(|item| variants.iter().any(|(v, _)| v == item));
+            if has {
+                variants.retain(|(v, _)| !list.contains(&v.as_str()));
+            }
+            has
+        };
+
+        let mut options = vec![];
+
+        if extract(&["true", "false"]) {
+            options.push(Type::TrueFalse);
+        } else if extract(&["yes", "no"]) {
+            options.push(Type::YesNo);
+        } else if extract(&["on", "off"]) {
+            options.push(Type::OnOff);
+        }
+
+        if extract(&["ltr", "rtl"]) {
+            options.push(Type::HorizontalDir);
+        }
+
+        if extract(&["none"]) {
+            options.push(Type::None);
+        }
+
+        if extract(&["auto"]) {
+            options.push(Type::Auto);
+        }
+
+        if !variants.is_empty() {
+            let len = variants.len();
+            let start = (0..ctx.strings.len())
+                .find(|&i| ctx.strings.get(i..i + len) == Some(variants.as_slice()))
+                .unwrap_or_else(|| {
+                    let i = ctx.strings.len();
+                    ctx.strings.extend(variants);
+                    i
+                });
+
+            options.push(Type::Strings(start, start + len));
+        }
+
+        if options.len() == 1 {
+            options.into_iter().next().unwrap()
+        } else {
+            Type::union_(options)
+        }
+    }
+
     fn union_(iter: impl IntoIterator<Item = Type>) -> Type {
         Type::Union(iter.into_iter().collect())
     }
@@ -149,6 +204,29 @@ impl Type {
             Type::List(ty, c, b) => format!("Type::List(&{}, {c:?}, {b:?})", ty.encode()),
             _ => format!("Type::{:?}", self),
         }
+    }
+}
+
+/// A variant in a stringy enum.
+trait EnumVariant {
+    fn with_docs(self) -> (String, String);
+}
+
+impl EnumVariant for &str {
+    fn with_docs(self) -> (String, String) {
+        (self.into(), String::new())
+    }
+}
+
+impl EnumVariant for String {
+    fn with_docs(self) -> (String, String) {
+        (self, String::new())
+    }
+}
+
+impl EnumVariant for (String, String) {
+    fn with_docs(self) -> (String, String) {
+        self
     }
 }
 
@@ -186,21 +264,6 @@ macro_rules! re {
     ($s:expr) => {
         lazy!(Regex = Regex::new($s).unwrap())
     };
-}
-
-/// Like `match`, but with regular expressions!
-macro_rules! regex_match {
-    ($text:expr, {
-        $($re:literal $(if $guard:expr)? => $out:expr,)*
-        _ => $final:expr $(,)?
-    }) => {{
-        let __text = $text;
-        match () {
-            $(_ if re!(&concat!("(?i)^", $re, "$")).is_match(__text)
-                $(&& $guard)? => $out,)*
-            _ => $final
-        }
-    }};
 }
 
 /// Collects all attributes with documentation and descriptions.
@@ -243,7 +306,7 @@ fn collect_html_attributes(ctx: &mut Context, infos: &mut Vec<AttrInfo>) {
         };
 
         let ty_cell = tr.select_first(s!("td:nth-of-type(3)"));
-        let ty = determine_type(ctx, &name, ty_cell, &mut docs);
+        let ty = determine_type(ctx, &name, &applies_to, ty_cell, &mut docs);
         infos.push(AttrInfo {
             name,
             docs,
@@ -270,7 +333,7 @@ fn collect_aria_attributes(ctx: &mut Context, infos: &mut Vec<AttrInfo>) {
     infos.push(AttrInfo {
         name: "role".into(),
         docs: "An ARIA role.".into(),
-        ty: create_str_enum(
+        ty: Type::strings(
             ctx,
             role_dl
                 .select(s!("dt code"))
@@ -353,91 +416,146 @@ fn collect_attr_indices(tr: ElementRef, tag: &str, attrs: &[AttrInfo]) -> Vec<us
 }
 
 /// Determines the Rust type for an HTML attribute.
-fn determine_type(ctx: &mut Context, attr: &str, cell: ElementRef, docs: &mut String) -> Type {
-    let textual_ty = cell
-        .inner_text()
-        .trim()
-        .trim_end_matches("*")
-        .replace("\n", " ");
-    if let Some(ty) = try_parse_alternation(ctx, &textual_ty) {
-        return ty;
+fn determine_type(
+    ctx: &mut Context,
+    attr: &str,
+    applies_to: &Applicable,
+    cell: ElementRef,
+    docs: &mut String,
+) -> Type {
+    let description = cell.inner_text().replace("\n", " ").trim().to_owned();
+    if let Some(ty) = determine_by_attr(ctx, attr, applies_to, cell, docs)
+        .or_else(|| determine_by_description(ctx, &description, docs))
+        .or_else(|| determine_by_alternation(ctx, &description))
+    {
+        ty
+    } else {
+        panic!("attribute type not handled: {description} for {attr}")
     }
+}
 
-    regex_match!(textual_ty.as_str(), {
-        "autofill field name.*" => Type::Str,
-        "css declarations" => Type::Str,
-        "id" => Type::Str,
-        "regular expression.*" => Type::Str,
-        "serialized permissions policy" => Type::Str,
-        "text" => Type::Str,
-        "the source of an iframe srcdoc document" => Type::Str,
-        "valid (non-empty )?url.*" => Type::Str,
-        "valid bcp 47 language tag" => Type::Str,
-        "valid custom element name.*" => Type::Str,
-        "valid hash-name reference" => Type::Str,
-        "valid mime type string" => Type::Str,
+/// Determine an attribute's type through a hardcoded attr + element lookup.
+/// This is for types that are a bit more specific.
+fn determine_by_attr(
+    ctx: &mut Context,
+    attr: &str,
+    applies_to: &Applicable,
+    cell: ElementRef,
+    docs: &mut String,
+) -> Option<Type> {
+    let global = matches!(applies_to, Applicable::Globally);
+    let is = |v| applies_to.applies_specifically_to(v);
+    Some(match attr {
+        "accept" if is("input") => Type::list(Type::Str, ' '),
+        "accesskey" if global => {
+            docs.push_str(" Expects a single-codepoint string or an array thereof.");
+            Type::list(Type::Char, ',')
+        }
+        "as" if is("link") => {
+            let variants = ctx
+                .fetch
+                .select_first(s!("p:has(#destination-type)"))
+                .select(s!("code"))
+                .map(|elem| elem.inner_text());
+            Type::strings(ctx, variants)
+        }
+        "autocomplete" if is("input") => {
+            let variants = ctx
+                .html
+                .select_first(s!("#autofill ~ ol"))
+                .select(s!("li ul.brief"))
+                .flat_map(|item| {
+                    item.select(s!(
+                        "dfn[data-dfn-type=attr-value] code, code[id^=autofilling-form-controls]"
+                    ))
+                })
+                .map(|code| code.inner_text());
+            let ty = Type::strings(ctx, variants);
+            Type::list(ty, ' ')
+        }
+        "blocking" if is("link") => Type::list(Type::strings(ctx, ["blocking"]), ' '),
+        "coords" if is("area") => {
+            docs.push_str(" Expects an array of floating point numbers.");
+            Type::list_without_shorthand(Type::Float, ',')
+        }
+        "datetime" if is("time") => Type::union_([Type::Duration, Type::Datetime]),
+        "hidden" if global => Type::union_([Type::Presence, Type::strings(ctx, ["until-found"])]),
+        "itemprop" | "itemtype" if global => Type::list(Type::Str, ' '),
+        "min" | "max" if is("input") => Type::union_([Type::Str, Type::Float, Type::Datetime]),
+        "rel" if is("link") || is("a") => rel_type(ctx),
+        "sandbox" if is("iframe") => {
+            let variants = cell.select(s!("code")).map(|elem| elem.inner_text());
+            let ty = Type::strings(ctx, variants);
+            Type::list(ty, ' ')
+        }
+        "sizes" if is("link") => {
+            docs.push_str(
+                " Expects an array of sizes. Each size is specified as an \
+                  array of two integers (width and height).",
+            );
+            Type::list_without_shorthand(Type::IconSize, ' ')
+        }
+        "spellcheck" | "writingsuggestions" if global => Type::TrueFalse,
+        "step" if is("input") => Type::union_([Type::PositiveFloat, Type::strings(ctx, ["any"])]),
+        "value" if is("input") => Type::union_([
+            Type::Str,
+            Type::Float,
+            Type::Datetime,
+            Type::Color,
+            Type::list_without_shorthand(Type::Str, ','),
+        ]),
+        _ => return None,
+    })
+}
+
+/// Determine an attribute's type by matching on its description.
+fn determine_by_description(
+    ctx: &mut Context,
+    textual_ty: &str,
+    docs: &mut String,
+) -> Option<Type> {
+    Some(match textual_ty.to_lowercase().as_str() {
+        "boolean attribute" => Type::Presence,
+
+        "id"
+        | "id*"
+        | "text"
+        | "text*"
+        | "valid mime type string"
+        | "valid url potentially surrounded by spaces"
+        | "valid non-empty url potentially surrounded by spaces"
+        | "valid bcp 47 language tag"
+        | "valid media query list"
+        | "css declarations"
+        | "css declarations*"
+        | "regular expression matching the javascript pattern production"
+        | "serialized permissions policy"
+        | "valid hash-name reference"
+        | "valid hash-name reference*"
+        | "valid custom element name of a defined customized built-in element"
+        | "the source of an iframe srcdoc document"
+        | "the source of an iframe srcdoc document*" => Type::Str,
+        "valid bcp 47 language tag or the empty string" => {
+            Type::union_([Type::Str, Type::NoneEmpty])
+        }
+
         "valid integer" => Type::Int,
         "valid non-negative integer" => Type::NonNegativeInt,
         "valid non-negative integer greater than zero" => Type::PositiveInt,
-        "valid floating-point number" => Type::Float,
-        "valid float.* greater than zero, or \"any\"" => {
-            Type::union_([Type::PositiveFloat,  create_str_literal(ctx, "any")])
-        },
-        "css <color>" => Type::Color,
+        "valid floating-point number" | "valid floating-point number*" => Type::Float,
+        "valid floating-point number greater than zero" => Type::PositiveFloat,
+
         "valid date string with optional time" => Type::Datetime,
-        "valid month string.*valid duration string" => Type::union_([Type::Duration, Type::Datetime]),
-        "boolean attribute" => Type::Presence,
-        "valid bcp 47 language tag or the empty string" => Type::union_([Type::Str, Type::NoneEmpty]),
-        ".*until-found.*" if attr == "hidden" => {
-            Type::union_([Type::Presence, create_str_literal(ctx, "until-found")])
-        },
-        ".*true.*empty string.*" if matches!(attr, "spellcheck" | "writingsuggestions") => Type::Presence,
-        "valid list of floating-point numbers" => {
-            write!(docs, " Expects an array of floating point numbers.").unwrap();
-            Type::list_without_shorthand(Type::Float, ',')
-        },
-        ".*space-separated tokens.*" if attr == "rel" => rel_type(ctx),
-        ".*space-separated tokens.*" if attr == "sandbox" => {
-            let variants = cell
-                .select(s!("code"))
+        "css <color>" => Type::Color,
+
+        "valid navigable target name or keyword" => {
+            let variants = ctx
+                .html
+                .select(s!("#valid-browsing-context-name-or-keyword code"))
                 .map(|elem| elem.inner_text());
-            let ty = create_str_enum(ctx, variants);
-            Type::list(ty, ' ')
-        },
-        ".*space-separated tokens.*consisting of one code point.*" => {
-            write!(docs, " Expects a single-codepoint string or an array thereof.").unwrap();
-            Type::list(Type::Char, ',')
-        },
-        ".*space-separated tokens.*consisting of sizes" => {
-            write!(
-                docs,
-                " Expects an array of sizes. Each size is specified as an \
-                  array of two integers (width and height).",
-            ).unwrap();
-            Type::list_without_shorthand(Type::IconSize, ' ')
-        },
-        ".*space-separated tokens.*" => Type::list(Type::Str, ' '),
-        ".*comma-separated tokens.*" => Type::list(Type::Str, ','),
-        "valid media query list" => Type::Str,
-        "ascii case-insensitive match for \"utf-8\"" => create_str_literal(ctx, "utf-8"),
-        "varies" if matches!(attr, "min" | "max") => Type::union_([Type::Str, Type::Float, Type::Datetime]),
-        "varies" if attr == "value" => Type::union_([Type::Str, Type::Float, Type::Datetime, Type::Color, Type::list_without_shorthand(Type::Str, ',')]),
-        "comma-separated list of image candidate strings" => {
-            write!(
-                docs,
-                " Expects an array of dictionaries with the keys \
-                  `src` (string) and `width` (integer) or `density` (float).",
-            ).unwrap();
-            Type::list_without_shorthand(Type::ImageCandidate, ',')
-        },
-        "valid source size list" => {
-            write!(
-                docs,
-                " Expects an array of dictionaries with the keys \
-                  `condition` (string) and `size` (length).",
-            ).unwrap();
-            Type::list_without_shorthand(Type::SourceSize, ',')
-        },
+            Type::union_([Type::strings(ctx, variants), Type::Str])
+        }
+        "ascii case-insensitive match for \"utf-8\"" => Type::strings(ctx, ["utf-8"]),
         "input type keyword" => {
             let variants = ctx
                 .html
@@ -445,53 +563,51 @@ fn determine_type(ctx: &mut Context, attr: &str, cell: ElementRef, docs: &mut St
                     "table#attr-input-type-keywords > tbody > tr > td:first-child code"
                 ))
                 .map(|elem| elem.inner_text());
-            create_str_enum(ctx, variants)
-        },
+            Type::strings(ctx, variants)
+        }
         "referrer policy" => {
             let variants = ctx
                 .referrer
                 .select_first(s!("h2#referrer-policies ~ p"))
                 .select(s!("code"))
                 .map(|elem| elem.inner_text());
-            let ty = create_str_enum(ctx, variants);
+            let ty = Type::strings(ctx, variants);
             Type::union_([ty, Type::NoneEmpty])
-        },
-        "potential destination.*" => {
-            let variants = ctx
-                .fetch
-                .select_first(s!("p:has(#destination-type)"))
-                .select(s!("code"))
-                .map(|elem| elem.inner_text());
-            create_str_enum(ctx, variants)
-        },
-        "valid navigable target name or keyword" => {
-            let variants = ctx
-                .html
-                .select(s!("#valid-browsing-context-name-or-keyword code"))
-                .map(|elem| elem.inner_text());
-            Type::union_([create_str_enum(ctx, variants), Type::Str])
-        },
-        _ => panic!("not handled: {textual_ty} for {attr}"),
-    })
-}
+        }
 
-fn rel_type(ctx: &mut Context) -> Type {
-    let variants = ctx
-        .html
-        .select_first(s!("#table-link-relations"))
-        .select(s!("tbody tr td:first-of-type code"))
-        .map(|elem| elem.inner_text());
-    let ty = create_str_enum(ctx, variants);
-    Type::list(ty, ' ')
+        "set of space-separated tokens"
+        | "unordered set of unique space-separated tokens"
+        | "unordered set of unique space-separated tokens consisting of ids"
+        | "unordered set of unique space-separated tokens consisting of ids*"
+        | "set of space-separated tokens consisting of valid non-empty urls" => {
+            Type::list(Type::Str, ' ')
+        }
+        "comma-separated list of image candidate strings" => {
+            docs.push_str(
+                " Expects an array of dictionaries with the keys \
+                  `src` (string) and `width` (integer) or `density` (float).",
+            );
+            Type::list_without_shorthand(Type::ImageCandidate, ',')
+        }
+        "valid source size list" => {
+            docs.push_str(
+                " Expects an array of dictionaries with the keys \
+                  `condition` (string) and `size` (length).",
+            );
+            Type::list_without_shorthand(Type::SourceSize, ',')
+        }
+
+        _ => return None,
+    })
 }
 
 /// Tries to parse an attribute's textual as a semicolon-separate list of
 /// strings.
-fn try_parse_alternation(ctx: &mut Context, textual_ty: &str) -> Option<Type> {
+fn determine_by_alternation(ctx: &mut Context, description: &str) -> Option<Type> {
     let mut fallback = false;
 
     let mut variants = vec![];
-    for piece in textual_ty.split(";") {
+    for piece in description.split(";") {
         let piece = piece.trim();
         if piece.starts_with('"') && piece.ends_with('"') {
             variants.push(piece[1..piece.len() - 1].to_owned());
@@ -505,12 +621,23 @@ fn try_parse_alternation(ctx: &mut Context, textual_ty: &str) -> Option<Type> {
         }
     }
 
-    let mut ty = create_str_enum(ctx, variants);
+    let mut ty = Type::strings(ctx, variants);
     if fallback {
         ty = Type::union_([ty, Type::Str]);
     }
 
     Some(ty)
+}
+
+/// The type for the `rel` attribute.
+fn rel_type(ctx: &mut Context) -> Type {
+    let variants = ctx
+        .html
+        .select_first(s!("#table-link-relations"))
+        .select(s!("tbody tr td:first-of-type code"))
+        .map(|elem| elem.inner_text());
+    let ty = Type::strings(ctx, variants);
+    Type::list(ty, ' ')
 }
 
 /// Determines the Rust type for an ARIA attribute.
@@ -534,12 +661,12 @@ fn determine_aria_type(ctx: &mut Context, attr: &str) -> Type {
         }
         "tristate" => Type::union_([
             Type::TrueFalse,
-            create_str_literal(
+            Type::strings(
                 ctx,
-                (
+                [(
                     "mixed".into(),
                     "An intermediate value between true and false.".into(),
-                ),
+                )],
             ),
         ]),
         "true/false" => Type::TrueFalse,
@@ -563,93 +690,7 @@ fn determine_aria_values(ctx: &mut Context, attr: &str) -> Type {
                 tr.select_text(s!(".value-description")),
             )
         });
-    create_str_enum(ctx, variants)
-}
-
-/// Allocate a string literal type in the output.
-fn create_str_literal(ctx: &mut Context, variant: impl EnumVariant) -> Type {
-    create_str_enum(ctx, vec![variant])
-}
-
-/// Allocates a string enum type in the output.
-fn create_str_enum<V: EnumVariant>(
-    ctx: &mut Context,
-    variants: impl IntoIterator<Item = V>,
-) -> Type {
-    let mut variants: Vec<_> = variants.into_iter().map(V::with_docs).collect();
-    let mut extract = |list: &[&str]| {
-        let has = list
-            .iter()
-            .all(|item| variants.iter().any(|(v, _)| v == item));
-        if has {
-            variants.retain(|(v, _)| !list.contains(&v.as_str()));
-        }
-        has
-    };
-
-    let mut options = vec![];
-
-    if extract(&["true", "false"]) {
-        options.push(Type::TrueFalse);
-    } else if extract(&["yes", "no"]) {
-        options.push(Type::YesNo);
-    } else if extract(&["on", "off"]) {
-        options.push(Type::OnOff);
-    }
-
-    if extract(&["ltr", "rtl"]) {
-        options.push(Type::HorizontalDir);
-    }
-
-    if extract(&["none"]) {
-        options.push(Type::None);
-    }
-
-    if extract(&["auto"]) {
-        options.push(Type::Auto);
-    }
-
-    if !variants.is_empty() {
-        let len = variants.len();
-        let start = (0..ctx.strings.len())
-            .find(|&i| ctx.strings.get(i..i + len) == Some(variants.as_slice()))
-            .unwrap_or_else(|| {
-                let i = ctx.strings.len();
-                ctx.strings.extend(variants);
-                i
-            });
-
-        options.push(Type::Strings(start, start + len));
-    }
-
-    if options.len() == 1 {
-        options.into_iter().next().unwrap()
-    } else {
-        Type::union_(options)
-    }
-}
-
-/// A variant in a stringy enum.
-trait EnumVariant {
-    fn with_docs(self) -> (String, String);
-}
-
-impl EnumVariant for &str {
-    fn with_docs(self) -> (String, String) {
-        (self.into(), String::new())
-    }
-}
-
-impl EnumVariant for String {
-    fn with_docs(self) -> (String, String) {
-        (self, String::new())
-    }
-}
-
-impl EnumVariant for (String, String) {
-    fn with_docs(self) -> (String, String) {
-        self
-    }
+    Type::strings(ctx, variants)
 }
 
 /// Generates the output file.

@@ -454,10 +454,10 @@ fn determine_by_attr(
     let global = matches!(applies_to, Applicable::Globally);
     let is = |v| applies_to.applies_specifically_to(v);
     Some(match attr {
-        "accept" if is("input") => Type::list(Type::Str, ' '),
+        "accept" if is("input") => Type::list(Type::Str, ','),
         "accesskey" if global => {
             docs.push_str(" Expects a single-codepoint string or an array thereof.");
-            Type::list(Type::Char, ',')
+            Type::list(Type::Char, ' ')
         }
         "as" if is("link") => {
             let variants = ctx

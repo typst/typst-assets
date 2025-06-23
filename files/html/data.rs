@@ -580,7 +580,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "accesskey",
         "Keyboard shortcut to activate or focus element. Expects a single-codepoint string or an array thereof.",
-        Type::List(&Type::Char, ',', true),
+        Type::List(&Type::Char, ' ', true),
     ),
     AttrInfo::new(
         "aria-activedescendant",
@@ -965,7 +965,7 @@ pub const ATTRS: &[AttrInfo] = &[
     AttrInfo::new(
         "accept",
         "Hint for expected file type in file upload controls.",
-        Type::List(&Type::Str, ' ', true),
+        Type::List(&Type::Str, ',', true),
     ),
     AttrInfo::new(
         "accept-charset",

@@ -1,3 +1,6 @@
+[workspace]
+members = ["codegen"]
+
 [package]
 name = "typst-assets"
 description = "Assets for the Typst compiler."

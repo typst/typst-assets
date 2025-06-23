@@ -7,4 +7,3 @@ desktop.ini
 # Rust
 /target
 **/*.rs.bk
-Cargo.lock

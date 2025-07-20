@@ -57,6 +57,14 @@ pub mod icc {
     pub const S_RGB_V4: &[u8] = asset!("icc/sRGB-v4.icc");
 }
 
+/// PDF standard fonts.
+pub mod pdf {
+    /// A substitute for the `Zapf Dingbats` font.
+    pub const DING_BATS: &[u8] = asset!("fonts/FoxitDingbats.pfb");
+    /// A substite for the `Symbol` font.
+    pub const SYMBOL: &[u8] = asset!("fonts/FoxitSymbol.pfb");
+}
+
 /// Bundled fonts.
 ///
 /// This returns an empty iterator if the `fonts` feature is disabled.
@@ -83,21 +91,6 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
         asset!("fonts/DejaVuSansMono-BoldOblique.ttf"),
         asset!("fonts/DejaVuSansMono-Oblique.ttf"),
         asset!("fonts/DejaVuSansMono.ttf"),
-    ]
-    .into_iter()
-}
-
-/// Bundled PDF standard fonts.
-///
-/// This returns an empty iterator if the `fonts` feature is disabled.
-pub fn pdf_standard_fonts() -> impl Iterator<Item = &'static [u8]> {
-    #[cfg(not(feature = "fonts"))]
-    return [].into_iter();
-
-    #[cfg(feature = "fonts")]
-    [
-        asset!("fonts/FoxitDingbats.pfb"),
-        asset!("fonts/FoxitSymbol.pfb"),
     ]
     .into_iter()
 }

@@ -86,3 +86,18 @@ pub fn fonts() -> impl Iterator<Item = &'static [u8]> {
     ]
     .into_iter()
 }
+
+/// Bundled PDF standard fonts.
+///
+/// This returns an empty iterator if the `fonts` feature is disabled.
+pub fn pdf_standard_fonts() -> impl Iterator<Item = &'static [u8]> {
+    #[cfg(not(feature = "fonts"))]
+    return [].into_iter();
+
+    #[cfg(feature = "fonts")]
+    [
+        asset!("fonts/FoxitDingbats.pfb"),
+        asset!("fonts/FoxitSymbol.pfb"),
+    ]
+    .into_iter()
+}

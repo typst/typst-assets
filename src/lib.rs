@@ -57,6 +57,41 @@ pub mod icc {
     pub const S_RGB_V4: &[u8] = asset!("icc/sRGB-v4.icc");
 }
 
+/// PDF standard fonts.
+pub mod pdf {
+    /// Foxit Ding Bats Font.
+    pub const DING_BATS: &[u8] = asset!("fonts/FoxitDingbats.pfb");
+    /// Foxit Symbol Font.
+    pub const SYMBOL: &[u8] = asset!("fonts/FoxitSymbol.pfb");
+
+    /// Foxit Fixed font.
+    pub const FIXED: &[u8] = asset!("fonts/FoxitFixed.pfb");
+    /// Foxit Fixed Bold font.
+    pub const FIXED_BOLD: &[u8] = asset!("fonts/FoxitFixedBold.pfb");
+    /// Foxit Fixed Bold Italic font.
+    pub const FIXED_BOLD_ITALIC: &[u8] = asset!("fonts/FoxitFixedBoldItalic.pfb");
+    /// Foxit Fixed Italic font.
+    pub const FIXED_ITALIC: &[u8] = asset!("fonts/FoxitFixedItalic.pfb");
+
+    /// Foxit Sans font.
+    pub const SANS: &[u8] = asset!("fonts/FoxitSans.pfb");
+    /// Foxit Sans Bold font.
+    pub const SANS_BOLD: &[u8] = asset!("fonts/FoxitSansBold.pfb");
+    /// Foxit Sans Bold Italic font.
+    pub const SANS_BOLD_ITALIC: &[u8] = asset!("fonts/FoxitSansBoldItalic.pfb");
+    /// Foxit Sans Italic font.
+    pub const SANS_ITALIC: &[u8] = asset!("fonts/FoxitSansItalic.pfb");
+
+    /// Foxit Serif font.
+    pub const SERIF: &[u8] = asset!("fonts/FoxitSerif.pfb");
+    /// Foxit Serif Bold font.
+    pub const SERIF_BOLD: &[u8] = asset!("fonts/FoxitSerifBold.pfb");
+    /// Foxit Serif Bold Italic font.
+    pub const SERIF_BOLD_ITALIC: &[u8] = asset!("fonts/FoxitSerifBoldItalic.pfb");
+    /// Foxit Serif Italic font.
+    pub const SERIF_ITALIC: &[u8] = asset!("fonts/FoxitSerifItalic.pfb");
+}
+
 /// Bundled fonts.
 ///
 /// This returns an empty iterator if the `fonts` feature is disabled.

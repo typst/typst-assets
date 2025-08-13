@@ -210,7 +210,7 @@ impl Type {
                     .join(", ")
             ),
             Type::List(ty, c, b) => format!("Type::List(&{}, {c:?}, {b:?})", ty.encode()),
-            _ => format!("Type::{:?}", self),
+            _ => format!("Type::{self:?}"),
         }
     }
 }
@@ -827,11 +827,11 @@ where
 }
 
 trait StrExt {
-    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<str>;
+    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<'_, str>;
 }
 
 impl StrExt for str {
-    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<str> {
+    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<'_, str> {
         re.replace_all(self, replacement)
     }
 }

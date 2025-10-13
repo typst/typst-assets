@@ -15,3 +15,6 @@ license = "Apache-2.0"
 
 [features]
 fonts = []
+
+[dependencies]
+bitflags = "2"

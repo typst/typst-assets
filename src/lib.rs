@@ -9,6 +9,7 @@ macro_rules! asset {
 }
 
 pub mod html;
+pub mod mathml;
 
 /// ICU data.
 pub mod icu {

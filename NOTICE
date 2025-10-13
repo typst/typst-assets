@@ -827,6 +827,10 @@ The W3C Document license applies to
   https://www.w3.org/TR/referrer-policy/
   Copyright © 2017 World Wide Web Consortium.
 
+* The parts of the data found in `files/mathml/data.rs` that were derived from
+  https://www.w3.org/TR/mathml-core/
+  Copyright © 2025 World Wide Web Consortium.
+
 This work is being provided by the copyright holders under the following license.
 
 # License

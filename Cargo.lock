@@ -660,7 +660,7 @@ dependencies = [
 
 [[package]]
 name = "typst-assets"
-version = "0.14.0-rc.2"
+version = "0.14.0"
 
 [[package]]
 name = "typst-assets-codegen"

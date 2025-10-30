@@ -3,12 +3,11 @@
 //! The spec dir will automatically be populated with the necessary
 //! specifications if one is missing.
 
-use std::borrow::Cow;
-use std::fmt::{Display, Write};
-use std::path::PathBuf;
+use std::fmt::Write;
 
+use crate::*;
 use regex::Regex;
-use scraper::{ElementRef, Html, Selector};
+use scraper::{ElementRef, Selector};
 
 // When referencing more specs, make sure to update the NOTICE file.
 #[rustfmt::skip]
@@ -22,7 +21,7 @@ mod spec {
 
 pub fn main() {
     // Directory where specs will be read from / downloaded into.
-    let dir = std::env::args_os().nth(2).map(PathBuf::from);
+    let dir = std::env::args_os().nth(2).map(std::path::PathBuf::from);
     let mut ctx = Context {
         html: load_spec(&dir, spec::HTML),
         aria: load_spec(&dir, spec::ARIA),
@@ -50,28 +49,6 @@ pub fn main() {
     std::fs::write(path, code).unwrap();
 
     eprintln!("Success!");
-}
-
-/// Reads a spec from the directory or, if it does not exist, fetches and stores it.
-fn load_spec(spec_dir: &Option<PathBuf>, url: &str) -> ElementRef<'static> {
-    let text = if let Some(dir) = spec_dir {
-        // Extract the last part of the URL as the filename.
-        let name = url.rsplit_terminator("/").next().unwrap();
-        let path = dir.join(name).with_extension("html");
-        if path.exists() {
-            eprintln!("Reading from {}", path.display());
-            std::fs::read_to_string(&path).unwrap()
-        } else {
-            let text = crate::fetch(url);
-            eprintln!("Writing to {}", path.display());
-            std::fs::create_dir_all(dir).unwrap();
-            std::fs::write(&path, &text).unwrap();
-            text
-        }
-    } else {
-        crate::fetch(url)
-    };
-    Box::leak(Box::new(Html::parse_document(&text))).root_element()
 }
 
 struct Context<'a> {
@@ -250,28 +227,6 @@ impl Applicable {
             Self::Elements(elements) => elements.iter().any(|s| s == tag),
         }
     }
-}
-
-/// Creates a lazily initialized static value.
-macro_rules! lazy {
-    ($ty:ty = $init:expr) => {{
-        static VAL: ::std::sync::LazyLock<$ty> = ::std::sync::LazyLock::new(|| $init);
-        &*VAL
-    }};
-}
-
-/// Creates a static CSS selector.
-macro_rules! s {
-    ($s:literal) => {
-        lazy!(Selector = Selector::parse($s).unwrap())
-    };
-}
-
-/// Creates a lazily initialized regular expression.
-macro_rules! re {
-    ($s:expr) => {
-        lazy!(Regex = Regex::new($s).unwrap())
-    };
 }
 
 /// Collects all attributes with documentation and descriptions.
@@ -784,54 +739,4 @@ fn docs(text: &str) -> String {
         .trim_end_matches('.')
         .to_owned()
         + "."
-}
-
-/// Helpers methods on [`ElementRef`].
-trait ElementRefExt<'a> {
-    fn inner_text(&self) -> String;
-    fn select_text(&self, selector: &Selector) -> String;
-    fn select_first(&self, selector: &Selector) -> ElementRef<'a>;
-}
-
-impl<'a> ElementRefExt<'a> for ElementRef<'a> {
-    fn inner_text(&self) -> String {
-        self.text().collect()
-    }
-
-    fn select_text(&self, selector: &Selector) -> String {
-        self.select(selector).flat_map(|elem| elem.text()).collect()
-    }
-
-    #[track_caller]
-    fn select_first(&self, selector: &Selector) -> ElementRef<'a> {
-        self.select(selector)
-            .next()
-            .expect("found no matching element")
-    }
-}
-
-trait Join {
-    fn join(self, separator: &str) -> String;
-}
-
-impl<I, T> Join for I
-where
-    I: Iterator<Item = T>,
-    T: Display,
-{
-    fn join(self, separator: &str) -> String {
-        self.map(|v| v.to_string())
-            .collect::<Vec<_>>()
-            .join(separator)
-    }
-}
-
-trait StrExt {
-    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<'_, str>;
-}
-
-impl StrExt for str {
-    fn replace_regex(&self, re: &Regex, replacement: &str) -> Cow<'_, str> {
-        re.replace_all(self, replacement)
-    }
 }

@@ -23,7 +23,7 @@ pub mod icu {
     /// ```sh
     /// cargo install icu4x-datagen \
     ///   --locked \
-    ///   --git https://github.com/isuffix/icu4x \
+    ///   --git https://github.com/typst/icu4x \
     ///   --branch cj-patch-update
     /// ```
     /// Use `cargo {build,run} --locked --bin icu4x-datagen --` instead when

@@ -1,0 +1,25 @@
+diff --git a/provider/source/src/segmenter/mod.rs b/provider/source/src/segmenter/mod.rs
+index deeb8eb..0f49044 100644
+--- a/provider/source/src/segmenter/mod.rs
++++ b/provider/source/src/segmenter/mod.rs
+@@ -519,6 +519,20 @@ fn generate_rule_break_data(
+         }
+     }
+ 
++    // Chinese and Japanese forbid starting a line with U+2014 EM DASH and
++    // forbid splitting a dash run such as the 破折号 `——` across lines. The
++    // character is class B2 (breakable on both sides) in the UCD; assign it to
++    // `NS` so that LB21 (`× NS`) suppresses break opportunities before it.
++    // Applied after the properties loop so the generic `B2` range assignment
++    // cannot overwrite it.
++    if segmenter.segmenter_type == "line" {
++        let ns_index: u8 = get_index_from_name(&properties_names, "NS")
++            .expect("NS should be a line break property")
++            .try_into()
++            .unwrap();
++        properties_trie.set_value(0x2014, ns_index);
++    }
++
+     // sot and eot
+     properties_names.push("sot".to_string());
+     properties_names.push("eot".to_string());

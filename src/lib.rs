@@ -14,9 +14,11 @@ pub mod mathml;
 /// ICU data.
 pub mod icu {
     /// Custom ICU segmentation data that fixes line-breaking curly quotes
-    /// (`U+201C`, `U+201D`) in Chinese and Japanese. This should be removed
-    /// once we can use the Unicode 17.0 line segmenter, which is coming in the
-    /// next version of ICU4X.
+    /// (`U+201C`, `U+201D`) in Chinese and Japanese, and reassigns the em dash
+    /// (`U+2014`) from `B2` (`BreakBoth`) to `NS` (`NonStarter`) so that CJ
+    /// lines never start with it and dash runs like the 破折号 `——` are not
+    /// split across lines. This should be removed once we can use the Unicode
+    /// 17.0 line segmenter, which is coming in the next version of ICU4X.
     ///
     /// To generate the blob data, first install the patched `icu4x-datagen`
     /// binary:
@@ -27,7 +29,8 @@ pub mod icu {
     ///   --branch cj-patch-update
     /// ```
     /// Use `cargo {build,run} --locked --bin icu4x-datagen --` instead when
-    /// developing.
+    /// developing. The em dash fix is not yet upstream in the fork; apply
+    /// `files/icu/cj-em-dash.patch` to a checkout of the branch first.
     ///
     /// Then generate the postcard blob data with the following command:
     /// ```sh
